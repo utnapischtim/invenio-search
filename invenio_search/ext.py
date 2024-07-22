@@ -15,6 +15,8 @@ import os
 import warnings
 
 import dictdiffer
+from flask import current_app
+from opensearchpy.exceptions import ConnectionTimeout
 from pkg_resources import (
     iter_entry_points,
     resource_filename,
@@ -403,14 +405,19 @@ class _SearchState(object):
 
         for action in actions:
             if action["type"] == "create_index":
-                index_result, alias_result = self.create_index(
-                    action["index"],
-                    create_write_alias=action.get("create_write_alias", True),
-                    ignore=ignore,
-                )
-                yield index_result
-                if alias_result[0]:
-                    yield alias_result
+                try:
+                    index_result, alias_result = self.create_index(
+                        action["index"],
+                        create_write_alias=action.get("create_write_alias", True),
+                        ignore=ignore,
+                    )
+                    yield index_result
+                    if alias_result[0]:
+                        yield alias_result
+                except ConnectionTimeout:
+                    msg = "index: %s had timeout on creation"
+                    current_app.logger.warn(msg, action["index"])
+                    continue
             elif action["type"] == "create_alias":
                 yield (
                     action["alias"],
