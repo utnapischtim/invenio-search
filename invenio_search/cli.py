@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2024 CERN.
 # Copyright (C)      2022 TU Wien.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -78,9 +79,10 @@ def check():
 
 @index.command()
 @click.option("--force", is_flag=True, default=False)
+@click.option("--ignore-existing", is_flag=True, default=False)
 @with_appcontext
 @search_version_check
-def init(force):
+def init(force, ignore_existing):
     """Initialize registered aliases and mappings."""
     actions = [
         {
@@ -116,7 +118,10 @@ def init(force):
 
         click.secho(action["title"] + "...", fg="green", bold=True, file=sys.stderr)
         with click.progressbar(
-            action["function"](ignore=[400] if force else None),
+            action["function"](
+                ignore=[400] if force else None,
+                ignore_existing=ignore_existing,
+            ),
             length=len(action["items"]),
         ) as bar:
             for name, response in bar:

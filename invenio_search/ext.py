@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2024 CERN.
 # Copyright (C)      2022 TU Wien.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -485,7 +486,7 @@ class _SearchState(object):
                 ignore=ignore,
             )
 
-    def put_templates(self, ignore=None):
+    def put_templates(self, ignore=None, **kwargs):
         """Yield tuple with registered template and response from client."""
         for template in self.templates:
             yield self._put_template(
@@ -495,7 +496,7 @@ class _SearchState(object):
                 ignore,
             )
 
-    def put_component_templates(self, ignore=None):
+    def put_component_templates(self, ignore=None, **kwargs):
         for template in self.component_templates:
             yield self._put_template(
                 template,
@@ -505,7 +506,7 @@ class _SearchState(object):
                 enforce_prefix=False,
             )
 
-    def put_index_templates(self, ignore=None):
+    def put_index_templates(self, ignore=None, **kwargs):
         for template in self.index_templates:
             yield self._put_template(
                 template,
